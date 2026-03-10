@@ -1,71 +1,60 @@
 #include <stdio.h>
-#include <string.h>
 
-struct process {
-    char pid[10];
-    int at, bt, rt;
-    int ct, wt, tat;
-};
-
-int main() {
-    int n;
-    scanf("%d", &n);
-
-    struct process p[20];
-
-    for(int i = 0; i < n; i++) {
-        scanf("%s %d %d", p[i].pid, &p[i].at, &p[i].bt);
-        p[i].rt = p[i].bt;
-    }
-
-    int tq = 2;   // Time Quantum
-    int time = 0, remain = n;
+int main()
+{
+    int n, tq;
+    int at[20], bt[20], rt[20];
+    int wt[20], tat[20], ct[20];
+    int time = 0, remain;
     float avg_wt = 0, avg_tat = 0;
 
-    while(remain != 0) {
+    scanf("%d", &n);
 
-        int done = 1;
+    for(int i = 0; i < n; i++)
+    {
+        scanf("%d %d", &at[i], &bt[i]);
+        rt[i] = bt[i];
+    }
 
-        for(int i = 0; i < n; i++) {
+    scanf("%d", &tq);
 
-            if(p[i].rt > 0 && p[i].at <= time) {
+    remain = n;
 
-                done = 0;
-
-                if(p[i].rt > tq) {
+    while(remain > 0)
+    {
+        for(int i = 0; i < n; i++)
+        {
+            if(rt[i] > 0 && at[i] <= time)
+            {
+                if(rt[i] > tq)
+                {
                     time += tq;
-                    p[i].rt -= tq;
+                    rt[i] -= tq;
                 }
-                else {
-                    time += p[i].rt;
-                    p[i].ct = time;
-                    p[i].rt = 0;
+                else
+                {
+                    time += rt[i];
+                    ct[i] = time;
+                    rt[i] = 0;
 
-                    p[i].tat = p[i].ct - p[i].at;
-                    p[i].wt = p[i].tat - p[i].bt;
+                    tat[i] = ct[i] - at[i];
+                    wt[i] = tat[i] - bt[i];
 
-                    avg_wt += p[i].wt;
-                    avg_tat += p[i].tat;
+                    avg_wt += wt[i];
+                    avg_tat += tat[i];
 
                     remain--;
                 }
             }
         }
-
-        if(done)
-            time++;
+        time++;
     }
 
-    printf("\nWaiting Time:\n");
     for(int i = 0; i < n; i++)
-        printf("%s %d\n", p[i].pid, p[i].wt);
+        printf("%d %d\n", wt[i], tat[i]);
 
-    printf("\nTurnaround Time:\n");
-    for(int i = 0; i < n; i++)
-        printf("%s %d\n", p[i].pid, p[i].tat);
-
-    printf("\nAverage Waiting Time: %.2f\n", avg_wt/n);
-    printf("Average Turnaround Time: %.2f\n", avg_tat/n);
+    printf("%.2f\n", avg_wt/n);
+    printf("%.2f\n", avg_tat/n);
 
     return 0;
 }
