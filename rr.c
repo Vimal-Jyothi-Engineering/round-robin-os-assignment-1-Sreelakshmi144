@@ -18,14 +18,45 @@ int main() {
         p[i].rt = p[i].bt;
     }
 
-  ..
-    ..
-    ..
-    .
-    ..
-    
-   
-                 printf("Waiting Time:\n");
+    int tq = 2;   // fixed time quantum
+    int time = 0, remain = n;
+    float avg_wt = 0, avg_tat = 0;
+
+    while(remain > 0) {
+
+        int executed = 0;
+
+        for(int i = 0; i < n; i++) {
+
+            if(p[i].rt > 0 && p[i].at <= time) {
+
+                executed = 1;
+
+                if(p[i].rt <= tq) {
+                    time += p[i].rt;
+                    p[i].rt = 0;
+
+                    p[i].ct = time;
+                    p[i].tat = p[i].ct - p[i].at;
+                    p[i].wt = p[i].tat - p[i].bt;
+
+                    avg_wt += p[i].wt;
+                    avg_tat += p[i].tat;
+
+                    remain--;
+                }
+                else {
+                    p[i].rt -= tq;
+                    time += tq;
+                }
+            }
+        }
+
+        if(!executed)
+            time++;
+    }
+
+    printf("Waiting Time:\n");
     for(int i = 0; i < n; i++)
         printf("%s %d\n", p[i].pid, p[i].wt);
 
