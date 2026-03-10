@@ -18,25 +18,29 @@ int main() {
         p[i].rt = p[i].bt;
     }
 
-    int tq = 2;   // fixed time quantum
+    int tq = 2;   // Time Quantum
     int time = 0, remain = n;
     float avg_wt = 0, avg_tat = 0;
 
-    while(remain > 0) {
+    while(remain != 0) {
 
-        int executed = 0;
+        int done = 1;
 
         for(int i = 0; i < n; i++) {
 
             if(p[i].rt > 0 && p[i].at <= time) {
 
-                executed = 1;
+                done = 0;
 
-                if(p[i].rt <= tq) {
+                if(p[i].rt > tq) {
+                    time += tq;
+                    p[i].rt -= tq;
+                }
+                else {
                     time += p[i].rt;
+                    p[i].ct = time;
                     p[i].rt = 0;
 
-                    p[i].ct = time;
                     p[i].tat = p[i].ct - p[i].at;
                     p[i].wt = p[i].tat - p[i].bt;
 
@@ -45,26 +49,22 @@ int main() {
 
                     remain--;
                 }
-                else {
-                    p[i].rt -= tq;
-                    time += tq;
-                }
             }
         }
 
-        if(!executed)
+        if(done)
             time++;
     }
 
-    printf("Waiting Time:\n");
+    printf("\nWaiting Time:\n");
     for(int i = 0; i < n; i++)
         printf("%s %d\n", p[i].pid, p[i].wt);
 
-    printf("Turnaround Time:\n");
+    printf("\nTurnaround Time:\n");
     for(int i = 0; i < n; i++)
         printf("%s %d\n", p[i].pid, p[i].tat);
 
-    printf("Average Waiting Time: %.2f\n", avg_wt/n);
+    printf("\nAverage Waiting Time: %.2f\n", avg_wt/n);
     printf("Average Turnaround Time: %.2f\n", avg_tat/n);
 
     return 0;
